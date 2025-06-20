@@ -22,7 +22,8 @@ A powerful **live search sidebar** addon for Blender that integrates with the *E
 
 1. **Install Everything** search engine from [https://www.voidtools.com](https://www.voidtools.com)
 2. Copy `Everything64.dll` file to the `Everything` folder  
-   _(e.g., `C:\Program Files\Everything`)_
+   _(e.g., `C:\Program Files\Everything`)_  
+   **OR** install the DLL from the [Everything SDK](https://www.voidtools.com/support/everything/sdk/) (additional info could be found there).
 3. In Blender:
     - Go to `Edit > Preferences > Add-ons`
     - Click `Install`, then select this addon's `.zip` or source folder

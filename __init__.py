@@ -1,10 +1,12 @@
 bl_info = {
     "name": "Everything Search",
-    "blender": (4, 0, 0),
-    "category": "3D View",
     "author": "Titus",
-    "version": (2, 5, 3),
+    "version": (1, 0),
+    "blender": (4, 0, 0),
+    "location": "SideBar -> Everything",
     "description": "Everything live search in the sidebar with file opening support",
+    "doc_url": "https://github.com/TitusLVR/Everything_search",
+    "category": "Import-Export",
 }
 
 import bpy  # noqa: E402
@@ -36,7 +38,7 @@ def register():
     # Register keymap
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
-    if kc:        
+    if kc:
         km = kc.keymaps.new(name="Window", space_type='EMPTY')
         kmi = km.keymap_items.new("everything.open_panel", type='F9', value='PRESS')
         addon_keymaps.append((km, kmi))

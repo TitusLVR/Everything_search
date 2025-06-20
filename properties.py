@@ -39,7 +39,8 @@ class EverythingSearch(bpy.types.PropertyGroup):
         name="Search",
         default="",
         update=update_search,
-        options={'TEXTEDIT_UPDATE'}
+        options={'TEXTEDIT_UPDATE'},
+        description="Search query for Everything",
     )
     search_filter: bpy.props.EnumProperty(
         name="File Type",
@@ -57,6 +58,7 @@ class EverythingSearch(bpy.types.PropertyGroup):
         ],
         default="blend",
         update=update_search,
+        description="Filter results by file type",
     )
     scroll_offset: bpy.props.IntProperty(default=0)
     results: bpy.props.CollectionProperty(type=EverythingSearch_Item)

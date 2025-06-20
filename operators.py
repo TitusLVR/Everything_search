@@ -2,14 +2,17 @@ import bpy
 import os
 import subprocess
 
-import bpy
-import os
-import subprocess
 
 class EVERYTHING_OT_Open_File(bpy.types.Operator):
     """Open a file in Blender
-    CTRL + Click: Open the containing folder
-    ALT + Click: Open in a new Blender instance
+
+    Behaviour depends on file extension:
+    - .blend: open as main file (replaces current session)
+        ALT + Click: open in a new Blender instance (only for .blend files)
+    - .fbx, .obj, .usd: import into current scene using the corresponding import operator
+    - .py, .txt: load into the Blender Text Editor
+    - .tga, .png, .jpg, .jpeg: load as images (Image Editor & datablock)
+    CTRL + Click: open containing folder
     """
     bl_idname = "everything.open_file"
     bl_label = "Open File"
@@ -17,26 +20,62 @@ class EVERYTHING_OT_Open_File(bpy.types.Operator):
     filepath: bpy.props.StringProperty()
 
     def execute(self, context):
-        if os.path.exists(self.filepath):
-            bpy.ops.wm.open_mainfile(filepath=self.filepath)
-            return {'FINISHED'}
-        else:
+        # Ensure the file exists first
+        if not os.path.exists(self.filepath):
             self.report({'ERROR'}, "File not found.")
             return {'CANCELLED'}
 
+        _, ext = os.path.splitext(self.filepath)
+        ext = ext.lower()
+
+        try:
+            # 1️⃣  .blend – Replace current session
+            if ext == ".blend":
+                bpy.ops.wm.open_mainfile(filepath=self.filepath)
+
+            # 2️⃣  3‑D geometry imports
+            elif ext in {".fbx", ".obj", ".usd"}:
+                if ext == ".fbx":
+                    bpy.ops.import_scene.fbx(filepath=self.filepath)
+                elif ext == ".obj":
+                    bpy.ops.wm.obj_import(filepath=self.filepath)
+                else:  # .usd
+                    # USD importer is available in Blender 3.6+
+                    bpy.ops.wm.usd_import(filepath=self.filepath)
+
+            # 3️⃣  Scripts / plain‑text → Text Editor
+            elif ext in {".py", ".txt"}:
+                bpy.ops.text.open(filepath=self.filepath)
+
+            # 4️⃣  Images
+            elif ext in {".tga", ".png", ".jpg", ".jpeg"}:
+                bpy.ops.image.open(filepath=self.filepath)
+
+            # 5️⃣  Fallback – open folder
+            else:
+                folder = os.path.dirname(self.filepath)
+                if os.path.exists(folder):
+                    os.startfile(folder)
+                self.report({'WARNING'}, f"Unhandled extension '{ext}', folder opened instead.")
+            return {'FINISHED'}
+
+        except Exception as e:
+            self.report({'ERROR'}, f"Failed to open file: {e}")
+            return {'CANCELLED'}
+
     def invoke(self, context, event):
+        # Open containing folder
         if event.ctrl:
-            # Open the containing folder
             folder = os.path.dirname(self.filepath)
             if os.path.exists(folder):
-                os.startfile(folder)  # Windows-only; use `subprocess.call(["xdg-open", folder])` for Linux
+                os.startfile(folder)
                 return {'FINISHED'}
             else:
                 self.report({'ERROR'}, "Folder not found.")
                 return {'CANCELLED'}
 
+        # Open in a new Blender instance
         elif event.alt:
-            # Open in a new Blender instance
             blender_path = bpy.app.binary_path
             if os.path.exists(self.filepath):
                 subprocess.Popen([blender_path, self.filepath])
@@ -46,6 +85,7 @@ class EVERYTHING_OT_Open_File(bpy.types.Operator):
                 self.report({'ERROR'}, "File not found.")
                 return {'CANCELLED'}
 
+        # Default behaviour
         else:
             return self.execute(context)
 

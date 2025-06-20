@@ -5,25 +5,25 @@ import sys
 
 
 class EverythingSearch_Addon_Preferences(bpy.types.AddonPreferences):
-    bl_idname = __package__ or "everything_search"    
+    bl_idname = __package__ or "everything_search"
 
     everything_dll_path: bpy.props.StringProperty(
         name="Everything DLL Path",
         subtype='FILE_PATH',
         default="",
-        description="Path to Everything64.dll (should be inside the add-on folder or select manually)"
+        description="Path to Everything64.dll (usually in the Everything installation folder, e.g., C:\\Program Files\\Everything\\Everything64.dll). If not set, the add-on will not work.",
     )
     everything_results_max: bpy.props.IntProperty(
         name="Max Results",
         min=1, max=10000,
         default=512,
-        description="Maximum number of results to fetch"
+        description="Maximum number of Everything results to fetch. Lower values may improve performance but limit results (try 25~100 and increase if needed)"
     )
     everything_panel_show_max: bpy.props.IntProperty(
         name="Results Shown in Panel",
         min=1, max=100,
         default=25,
-        description="Number of results visible in sidebar at once"
+        description="Number of results visible in panel at once"
     )
 
     def dll_exists(self):
@@ -45,10 +45,10 @@ class EverythingSearch_Addon_Preferences(bpy.types.AddonPreferences):
         col.prop(self, "everything_dll_path")
         box = layout.box()
         box.label(text="Settings:", icon='SETTINGS')
-        col = box.column(align=True)        
+        col = box.column(align=True)
         col.prop(self, "everything_results_max")
         col.prop(self, "everything_panel_show_max")
-        
+
         box = layout.box()
         box.label(text="Shortcut to Open Panel:", icon='KEY_HLT')
 

@@ -2,10 +2,20 @@ import bpy
 import os
 import subprocess
 
+import bpy
+import os
+import subprocess
+
 class EVERYTHING_OT_Open_File(bpy.types.Operator):
+    """Open a file in Blender
+    CTRL + Click: Open the containing folder
+    ALT + Click: Open in a new Blender instance
+    """
     bl_idname = "everything.open_file"
     bl_label = "Open File"
+
     filepath: bpy.props.StringProperty()
+
     def execute(self, context):
         if os.path.exists(self.filepath):
             bpy.ops.wm.open_mainfile(filepath=self.filepath)
@@ -13,17 +23,32 @@ class EVERYTHING_OT_Open_File(bpy.types.Operator):
         else:
             self.report({'ERROR'}, "File not found.")
             return {'CANCELLED'}
+
     def invoke(self, context, event):
         if event.ctrl:
+            # Open the containing folder
             folder = os.path.dirname(self.filepath)
             if os.path.exists(folder):
-                os.startfile(folder)
+                os.startfile(folder)  # Windows-only; use `subprocess.call(["xdg-open", folder])` for Linux
                 return {'FINISHED'}
             else:
                 self.report({'ERROR'}, "Folder not found.")
                 return {'CANCELLED'}
+
+        elif event.alt:
+            # Open in a new Blender instance
+            blender_path = bpy.app.binary_path
+            if os.path.exists(self.filepath):
+                subprocess.Popen([blender_path, self.filepath])
+                self.report({'INFO'}, "Opened in new Blender instance.")
+                return {'FINISHED'}
+            else:
+                self.report({'ERROR'}, "File not found.")
+                return {'CANCELLED'}
+
         else:
             return self.execute(context)
+
 
 class EVERYTHING_OT_Scroll_Results(bpy.types.Operator):
     bl_idname = "everything.scroll_results"

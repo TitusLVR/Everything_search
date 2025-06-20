@@ -60,7 +60,7 @@ A powerful **live search sidebar** addon for Blender that integrates with the *E
 
 **Titus**  
 📧 titus.mailbox@gmail.com  
-🌐 GitHub: [@titus.mailbox](https://github.com/titus.mailbox)
+🌐 GitHub: [@Titus](https://github.com/TitusLVR)
 
 ---
 

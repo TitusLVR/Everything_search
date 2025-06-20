@@ -58,8 +58,7 @@ A powerful **live search sidebar** addon for Blender that integrates with the *E
 
 ## 🧑‍💻 Author
 
-**Titus**  
-📧 titus.mailbox@gmail.com  
+**Titus**
 🌐 GitHub: [@Titus](https://github.com/TitusLVR)
 
 ---

@@ -2,9 +2,6 @@
 
 A powerful **live search sidebar** addon for Blender that integrates with the *Everything* search engine on Windows. It allows users to instantly locate and open files directly within Blender using a searchable sidebar panel.
 
-![Addon UI Screenshot](b8f89e16-7d0d-4c0e-b918-bae2244364f3.png)
-![Addon UI Screenshot 2](6aaa5836-538a-4c8b-87f7-51ac2efd1e55.png)
-
 ---
 
 ## ✨ Features

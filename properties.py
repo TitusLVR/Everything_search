@@ -1,13 +1,13 @@
 import bpy
 import os
-from .ipc import EverythingIPC
+from .preferences import get_dynamic_filetype_items
 
-def update_search(self, context):    
-    prefs = bpy.context.preferences.addons[__package__].preferences
+def update_search(self, context):
+    prefs = bpy.context.preferences.addons[__package__ or "Everything_search"].preferences
     props = context.scene.EverythingSearch
-    
     query = props.search_query
-    filetype = props.search_filter
+    # Use the dynamic selection for filetype!
+    filetype = props.filetype_enum if props.filetype_enum else "blend"
     props.results.clear()
     props.scroll_offset = 0
 
@@ -17,11 +17,11 @@ def update_search(self, context):
         print("[Everything Sidebar] DLL path not set or DLL missing.")
         return
     try:
+        from .ipc import EverythingIPC
         search_str = f"{query} *.{filetype}" if filetype != "all" else query
         results = EverythingIPC(prefs.everything_dll_path).query(
             search_str, prefs.everything_results_max
         )
-        
         for path in results:
             item = props.results.add()
             item.name = path
@@ -42,25 +42,10 @@ class EverythingSearch(bpy.types.PropertyGroup):
         options={'TEXTEDIT_UPDATE'},
         description="Search query for Everything",
     )
-    search_filter: bpy.props.EnumProperty(
+    filetype_enum: bpy.props.StringProperty(
         name="File Type",
-        items=[
-            ("blend", "BLEND", "Blend files"),
-            ("tga", "TGA", "Targa files"),
-            ("png", "PNG", "PNG files"),
-            ("jpg", "JPG", "JPEG files"),
-            ("obj", "OBJ", "OBJ files"),
-            ("fbx", "FBX", "FBX files"),
-            ("usd", "USD", "USD files"),
-            ("py", "PY", "Python scripts"),
-            ("txt", "TXT", "Text files"),
-            ("all", "All", "All file types"),
-        ],
         default="blend",
-        update=update_search,
-        description="Filter results by file type",
+        description="Filter results by file type"
     )
     scroll_offset: bpy.props.IntProperty(default=0)
     results: bpy.props.CollectionProperty(type=EverythingSearch_Item)
-
-CLASSES = (EverythingSearch_Item, EverythingSearch)

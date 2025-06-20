@@ -1,7 +1,7 @@
 import bpy
 import os
 import subprocess
-
+from .preferences import image_exts, model_exts, text_exts, video_exts, audio_exts
 
 class EVERYTHING_OT_Open_File(bpy.types.Operator):
     """Open a file in Blender
@@ -29,29 +29,54 @@ class EVERYTHING_OT_Open_File(bpy.types.Operator):
         ext = ext.lower()
 
         try:
-            # 1️⃣  .blend – Replace current session
+            #.blend – Replace current session
             if ext == ".blend":
                 bpy.ops.wm.open_mainfile(filepath=self.filepath)
 
-            # 2️⃣  3‑D geometry imports
-            elif ext in {".fbx", ".obj", ".usd"}:
+            #3‑D geometry imports .obj", ".fbx", ".usd", ".stl", ".dae", ".abc", ".ply", ".glb", ".gltf", ".3ds", ".x3d", ".wrl", ".svg", ".obj.gz"
+            elif ext in model_exts:
                 if ext == ".fbx":
                     bpy.ops.import_scene.fbx(filepath=self.filepath)
                 elif ext == ".obj":
                     bpy.ops.wm.obj_import(filepath=self.filepath)
-                else:  # .usd
-                    # USD importer is available in Blender 3.6+
+                elif ext == ".usd":
                     bpy.ops.wm.usd_import(filepath=self.filepath)
+                elif ext == ".stl":  # STL files
+                    bpy.ops.import_mesh.stl(filepath=self.filepath)
+                elif ext == ".dae":  # DAE files
+                    bpy.ops.wm.collada_import(filepath=self.filepath)
+                elif ext == ".abc":  # Alembic files
+                    bpy.ops.wm.alembic_import(filepath=self.filepath)
+                elif ext == ".glb" or ext == ".gltf":  # GLTF/GLB files
+                    bpy.ops.wm.gltf_import(filepath=self.filepath)
+                elif ext == ".ply":  # PLY files
+                    bpy.ops.import_mesh.ply(filepath=self.filepath)
+                elif ext == ".glb":
+                    bpy.ops.wm.gltf_import(filepath=self.filepath)                
+                elif ext == ".3ds":  # 3DS files
+                    bpy.ops.import_scene.autodesk_3ds(filepath=self.filepath)
+                elif ext == ".x3d" or ext == ".wrl":  # X3D/VRML files
+                    bpy.ops.import_scene.x3d(filepath=self.filepath)
+                elif ext == ".wrl":  # VRML files
+                    bpy.ops.import_scene.x3d(filepath=self.filepath)
+                elif ext == ".svg":  # SVG files
+                    bpy.ops.import_curve.svg(filepath=self.filepath)
+                elif ext == ".obj.gz":  # Gzipped OBJ files
+                    bpy.ops.wm.obj_import(filepath=self.filepath, use_gzip=True)
 
-            # 3️⃣  Scripts / plain‑text → Text Editor
-            elif ext in {".py", ".txt"}:
+            #Scripts / plain‑text → Text Editor
+            elif ext in text_exts:
                 bpy.ops.text.open(filepath=self.filepath)
-
-            # 4️⃣  Images
-            elif ext in {".tga", ".png", ".jpg", ".jpeg"}:
+            # Video files
+            elif ext in video_exts:
+                bpy.ops.clip.open(filepath=self.filepath)
+            # Audio files
+            elif ext in audio_exts:
+                bpy.ops.sound.open(filepath=self.filepath)
+            # Images
+            elif ext in image_exts:
                 bpy.ops.image.open(filepath=self.filepath)
-
-            # 5️⃣  Fallback – open folder
+            # Fallback – open folder
             else:
                 folder = os.path.dirname(self.filepath)
                 if os.path.exists(folder):
